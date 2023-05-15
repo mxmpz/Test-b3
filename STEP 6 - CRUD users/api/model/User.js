@@ -12,13 +12,13 @@ export default class User {
    * @param {String} phone     - Téléphone (mobile ou fixe)
    * @param {String} email     - Email
    */
-  constructor(id, lastName, firstName, birthDate, address, phone, email) {
-    this.id        = id;
-    this.lastName  = lastName;
-    this.firstName = firstName;
-    this.birthDate = birthDate;
-    this.address   = address;
-    this.phone     = phone;
-    this.email     = email;
+  constructor (id, lastName, firstName, birthDate, address, phone, email) {
+    this.id = id
+    this.lastName = lastName
+    this.firstName = firstName
+    this.birthDate = birthDate
+    this.address = address
+    this.phone = phone
+    this.email = email
   }
 }

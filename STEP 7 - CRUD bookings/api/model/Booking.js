@@ -9,11 +9,11 @@ export default class Booking {
    * @param {Book}   book       - Elément loué
    * @param {User}   user       - Utilisateur qui loue l'élément
    */
-  constructor(id, rentDate, returnDate, book, user) {
-    this.id  = id;
-    this.rentDate   = rentDate;
-    this.returnDate = returnDate;
-    this.book       = book;
-    this.user       = user;
+  constructor (id, rentDate, returnDate, book, user) {
+    this.id = id
+    this.rentDate = rentDate
+    this.returnDate = returnDate
+    this.book = book
+    this.user = user
   }
 }

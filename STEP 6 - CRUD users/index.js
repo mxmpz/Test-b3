@@ -1,7 +1,7 @@
-import dotenv from 'dotenv';
-dotenv.config();
+import dotenv from 'dotenv'
 
-import api from './api/index.js';
+import api from './api/index.js'
+dotenv.config()
 
 // For testing purposes
-export default api.launch(process.env.API_PORT);
+export default api.launch(process.env.API_PORT)
