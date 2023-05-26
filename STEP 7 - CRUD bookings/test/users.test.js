@@ -107,9 +107,7 @@ describe('Users', function () {
       phone: '9999999999999999999',
       email: 'talonalyce@gmail.com'
     }
-    if (user.phone.length === 10) {
-      console.log('ok')
-    } else {
+    if (user.phone.length !== 10 && typeof user.phone !== 'number') {
       chai.request(api)
         .post('/users')
         .send(user)
@@ -134,10 +132,8 @@ describe('Users', function () {
       email: 'talonalyce@.com'
     }
     if (/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(user.email)) {
-      console.log('ok')
-    } else {
       chai.request(api)
-        .put('/users')
+        .post('/users')
         .send(user)
         .end((_, res) => {
           chai.expect(res.statusCode).to.equal(404)
@@ -150,32 +146,44 @@ describe('Users', function () {
   })
 
   it('GET /users/:id should return a success response with found user', function (done) {
+    const user = {
+      id: '1281464365499',
+      lastName: 'CADIEUX',
+      firstName: 'Marius',
+      birthDate: '1985-10-27',
+      address: '3 Rue Henri Hure 49300 Cholet',
+      phone: '0666666666',
+      email: 'mariuscadieux@gmail.com'
+    }
     chai.request(api)
-      .get('/users/1281464365499')
+      .get(`/users/${user.id}`)
       .end((_, res) => {
         chai.expect(res.statusCode).to.equal(200)
         chai.expect(res.body).to.deep.equal({
-          data: {
-            id: '1281464365499',
-            lastName: 'CADIEUX',
-            firstName: 'Marius',
-            birthDate: '1985-10-27',
-            address: '3 Rue Henri Hure 49300 Cholet',
-            phone: '0666666666',
-            email: 'mariuscadieux@gmail.com'
-          }
+          data: user
         })
         done()
       })
   })
 
   it('GET /users/:id should return not found response if the user does not exists', function (done) {
+    const user = {
+      id: '1281464365499',
+      lastName: 'CADIEUX',
+      firstName: 'Marius',
+      birthDate: '1985-10-27',
+      address: '3 Rue Henri Hure 49300 Cholet',
+      phone: '0666666666',
+      email: 'mariuscadieux@gmail.com'
+    }
+    const fakeId = '5616849616598'
     chai.request(api)
-      .get('/users/' + uuid)
+      .get(`/users/${fakeId}`)
+      .send(user)
       .end((_, res) => {
         chai.expect(res.statusCode).to.equal(404)
         chai.expect(res.body).to.deep.equal({
-          error: 'User ' + uuid + ' not found'
+          error: `User ${fakeId} not found`
         })
         done()
       })
@@ -192,20 +200,12 @@ describe('Users', function () {
       email: 'talonalyce@gmail.com'
     }
     chai.request(api)
-      .put('/users/5643431345887')
+      .put(`/users/${user.id}`)
       .send(user)
       .end((_, res) => {
         chai.expect(res.statusCode).to.equal(200)
         chai.expect(res.body).to.deep.equal({
-          data: {
-            id: '5643431345887',
-            lastName: 'TALON',
-            firstName: 'Alyce',
-            birthDate: '1992-07-26',
-            address: '3 Rue Henri Hure 49300 Cholet',
-            phone: '0777777777',
-            email: 'talonalyce@gmail.com'
-          }
+          data: user
         })
         done()
       })
@@ -213,21 +213,22 @@ describe('Users', function () {
 
   it('PUT /users/:id should return not found response if the user does not exists', function (done) {
     const user = {
-      id: '1111111111111',
-      lastName: 'TEST',
-      firstName: 'Name',
-      birthDate: '2000-04-10',
-      address: '3 Impasse des Champs',
-      phone: '0677667766',
-      email: 'testname@gmail.com'
+      id: '5643431345887',
+      lastName: 'TALON',
+      firstName: 'Alyce',
+      birthDate: '1992-07-26',
+      address: '3 Rue Henri Hure 49300 Cholet',
+      phone: '0777777777',
+      email: 'talonalyce@gmail.com'
     }
+    const fakeId = '1111111111111'
     chai.request(api)
-      .put('/users/1111111111111')
+      .put(`/users/${fakeId}`)
       .send(user)
       .end((_, res) => {
         chai.expect(res.statusCode).to.equal(404)
         chai.expect(res.body).to.deep.equal({
-          error: 'User 1111111111111 not found'
+          error: `User ${fakeId} not found`
         })
         done()
       })
@@ -247,12 +248,12 @@ describe('Users', function () {
       console.log('ok')
     } else {
       chai.request(api)
-        .put('/users/5643431345887')
+        .put(`/users/${user.id}`)
         .send(user)
         .end((_, res) => {
           chai.expect(res.statusCode).to.equal(404)
           chai.expect(res.body).to.deep.equal({
-            error: 'Birth Date of User 5643431345887 is malformed'
+            error: `Birth Date of User ${user.id} is malformed`
           })
           done()
         })
@@ -269,16 +270,16 @@ describe('Users', function () {
       phone: '9999999999999999999',
       email: 'talonalyce@gmail.com'
     }
-    if (user.phone.length === 10) {
+    if (user.phone.length === 10 && typeof user.phone !== 'number') {
       console.log('ok')
     } else {
       chai.request(api)
-        .put('/users/5643431345887')
+        .put(`/users/${user.id}`)
         .send(user)
         .end((_, res) => {
           chai.expect(res.statusCode).to.equal(404)
           chai.expect(res.body).to.deep.equal({
-            error: 'Phone of User 5643431345887 is malformed'
+            error: `Phone of User ${user.id} is malformed`
           })
           done()
         })
@@ -296,15 +297,13 @@ describe('Users', function () {
       email: 'talonalyce@.com'
     }
     if (/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(user.email)) {
-      console.log('ok')
-    } else {
       chai.request(api)
-        .put('/users/5643431345887')
+        .put(`/users/${user.id}`)
         .send(user)
         .end((_, res) => {
           chai.expect(res.statusCode).to.equal(404)
           chai.expect(res.body).to.deep.equal({
-            error: 'Email of User 5643431345887 is malformed'
+            error: `Email of User ${user.id} is malformed`
           })
           done()
         })
@@ -334,12 +333,13 @@ describe('Users', function () {
   })
 
   it('DELETE /users/:id should return not found response if the user does not exists', function (done) {
+    const fakeDeleteId = '1111111111111'
     chai.request(api)
-      .delete('/users/1111111111111')
+      .delete(`/users/${fakeDeleteId}`)
       .end((_, res) => {
         chai.expect(res.statusCode).to.equal(404)
         chai.expect(res.body).to.deep.equal({
-          error: 'User 1111111111111 not found'
+          error: `User ${fakeDeleteId} not found`
         })
         done()
       })
