@@ -311,8 +311,9 @@ describe('Users', function () {
   })
 
   it('DELETE /users/:id should return a success response', function (done) {
+    const userDeleteId = '1281464365499'
     chai.request(api)
-      .delete('/users/1281464365499')
+      .delete(`/users/${userDeleteId}`)
       .end((_, res) => {
         chai.expect(res.statusCode).to.equal(200)
         chai.expect(res.body).to.deep.equal({

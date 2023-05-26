@@ -100,35 +100,81 @@ describe('Bookings', function () {
     }
   })
 
-  // it('POST /bookings should return a bad request if book not found')
+  it('POST /bookings should return a bad request if book not found', function (done) {
+    const booking = {
+      id: '5749461811651',
+      rentDate: '2022-10-07',
+      returnDate: '2022-10-16',
+      book: 'AAAAAAAAAAAAAAAAAAAAAAA',
+      user: '1281464365499'
+    }
+    chai.request(api)
+      .post('/bookings')
+      .send(booking)
+      .end((_, res) => {
+        chai.expect(res.statusCode).to.equal(404)
+        chai.expect(res.body).to.deep.equal({
+          error: 'Book of booking not found'
+        })
+        done()
+      })
+  })
 
-  // it('POST /bookings should return a bad request if user not found')
+  it('POST /bookings should return a bad request if user not found', function (done) {
+    const booking = {
+      id: '5749461811651',
+      rentDate: '2022-10-07',
+      returnDate: '2022-10-16',
+      book: 'Livre3',
+      user: '1111111111111'
+    }
+    chai.request(api)
+      .post('/bookings')
+      .send(booking)
+      .end((_, res) => {
+        chai.expect(res.statusCode).to.equal(404)
+        chai.expect(res.body).to.deep.equal({
+          error: 'User of booking not found'
+        })
+        done()
+      })
+  })
 
   it('GET /bookings/:id should return a success response with found booking', function (done) {
+    const booking = {
+      id: '5749461811651',
+      rentDate: '2022-10-07',
+      returnDate: '2022-10-16',
+      book: 'Livre3',
+      user: '1281464365499'
+    }
     chai.request(api)
-      .get('/bookings/1281464365499')
+      .get(`/bookings/${booking.id}`)
       .end((_, res) => {
         chai.expect(res.statusCode).to.equal(200)
         chai.expect(res.body).to.deep.equal({
-          data: {
-            id: '5749461811651',
-            rentDate: '2022-10-07',
-            returnDate: '2022-10-16',
-            book: 'Livre3',
-            user: '1281464365499'
-          }
+          data: booking
         })
         done()
       })
   })
 
   it('GET /bookings/:id should return not found response if the booking does not exists', function (done) {
+    const booking = {
+      id: '5749461811651',
+      rentDate: '2022-10-07',
+      returnDate: '2022-10-16',
+      book: 'Livre3',
+      user: '1281464365499'
+    }
+    const fakeId = '1111111111111'
     chai.request(api)
-      .get('/bookings/1111111111111')
+      .get(`/bookings/${fakeId}`)
+      .send(booking)
       .end((_, res) => {
         chai.expect(res.statusCode).to.equal(404)
         chai.expect(res.body).to.deep.equal({
-          error: 'Booking 1111111111111 not found'
+          error: `Booking ${fakeId} not found`
         })
         done()
       })
@@ -143,18 +189,12 @@ describe('Bookings', function () {
       user: '1281464365499'
     }
     chai.request(api)
-      .put('/bookings/7984613166494')
+      .put(`/bookings/${booking.id}`)
       .send(booking)
       .end((_, res) => {
         chai.expect(res.statusCode).to.equal(200)
         chai.expect(res.body).to.deep.equal({
-          data: {
-            id: '7984613166494',
-            rentDate: '2023-01-10',
-            returnDate: '2023-02-19',
-            book: 'Livre4',
-            user: '1281464365499'
-          }
+          data: booking
         })
         done()
       })
@@ -168,36 +208,37 @@ describe('Bookings', function () {
       book: 'Nomdulivre',
       user: '1281464365499'
     }
+    const fakeId = '222222222222'
     chai.request(api)
-      .put('/bookings/222222222222')
+      .put(`/bookings/${fakeId}`)
       .send(booking)
       .end((_, res) => {
         chai.expect(res.statusCode).to.equal(404)
         chai.expect(res.body).to.deep.equal({
-          error: 'Booking 222222222222 not found'
+          error: `Booking ${fakeId} not found`
         })
         done()
       })
   })
 
   it('PUT /bookings/:id should return a bad request if rentDate malformed', function (done) {
-    const bookings = {
+    const booking = {
       id: '5749461811651',
       rentDate: '20221007',
       returnDate: '2022-10-16',
       book: 'Livre3',
       user: '1281464365499'
     }
-    if (Date.parse(bookings.rentDate)) {
+    if (Date.parse(booking.rentDate)) {
       console.log('ok')
     } else {
       chai.request(api)
-        .put('/bookings')
-        .send(bookings)
+        .put(`/bookings/${booking.id}`)
+        .send(booking)
         .end((_, res) => {
           chai.expect(res.statusCode).to.equal(404)
           chai.expect(res.body).to.deep.equal({
-            error: 'Rent Date of book is malformed'
+            error: `Rent Date of ${booking.id} is malformed`
           })
           done()
         })
@@ -205,36 +246,75 @@ describe('Bookings', function () {
   })
 
   it('PUT /bookings/:id should return a bad request if returnDate malformed', function (done) {
-    const bookings = {
+    const booking = {
       id: '5749461811651',
       rentDate: '2022-10-07',
       returnDate: '20221016',
       book: 'Livre3',
       user: '1281464365499'
     }
-    if (Date.parse(bookings.returnDate)) {
+    if (Date.parse(booking.returnDate)) {
       console.log('ok')
     } else {
       chai.request(api)
-        .put('/bookings')
-        .send(bookings)
+        .put(`/bookings/${booking.id}`)
+        .send(booking)
         .end((_, res) => {
           chai.expect(res.statusCode).to.equal(404)
           chai.expect(res.body).to.deep.equal({
-            error: 'RenturnDate of book is malformed'
+            error: `RenturnDate of ${booking.id} is malformed`
           })
           done()
         })
     }
   })
 
-  // it('PUT /bookings/:id should return a bad request if book not found')
+  it('PUT /bookings/:id should return a bad request if book not found', function (done) {
+    const booking = {
+      id: '5749461811651',
+      rentDate: '2022-10-07',
+      returnDate: '2022-10-16',
+      book: 'Livre3',
+      user: '1281464365499'
+    }
+    const fakeNameBook = 'AAAAAAAAAAAAAAAAAAAAAAA'
+    chai.request(api)
+      .put(`/bookings/${booking.id}`)
+      .send(booking)
+      .end((_, res) => {
+        chai.expect(res.statusCode).to.equal(404)
+        chai.expect(res.body).to.deep.equal({
+          error: `Book ${fakeNameBook} of booking not found`
+        })
+        done()
+      })
+  })
 
-  // it('PUT /bookings/:id should return a bad request if user not found')
+  it('PUT /bookings/:id should return a bad request if user not found', function (done) {
+    const booking = {
+      id: '5749461811651',
+      rentDate: '2022-10-07',
+      returnDate: '2022-10-16',
+      book: 'Livre3',
+      user: '1281464365499'
+    }
+    const fakeUserId = '1111111111111'
+    chai.request(api)
+      .put(`/bookings/${booking.id}`)
+      .send(booking)
+      .end((_, res) => {
+        chai.expect(res.statusCode).to.equal(404)
+        chai.expect(res.body).to.deep.equal({
+          error: `User ${fakeUserId} of booking not found`
+        })
+        done()
+      })
+  })
 
   it('DELETE /bookings/:id should return a success response', function (done) {
+    const bookingsDeleteId = '4494125435659'
     chai.request(api)
-      .delete('/bookings/4494125435659')
+      .delete(`/bookings/${bookingsDeleteId}`)
       .end((_, res) => {
         chai.expect(res.statusCode).to.equal(200)
         chai.expect(res.body).to.deep.equal({
@@ -251,13 +331,15 @@ describe('Bookings', function () {
         done()
       })
   })
+
   it('DELETE /bookings/:id should return not found response if the booking does not exists', function (done) {
+    const idError = '1234567899999'
     chai.request(api)
-      .delete('/bookings/3333333333333')
+      .delete(`/bookings/${idError}`)
       .end((_, res) => {
         chai.expect(res.statusCode).to.equal(404)
         chai.expect(res.body).to.deep.equal({
-          error: 'Booking 3333333333333 not found'
+          error: `Booking ${idError} not found`
         })
         done()
       })
