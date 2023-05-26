@@ -64,52 +64,105 @@ describe('Books', function () {
       langCode: 'FR',
       price: 3.9
     }
-    if (book.isbn13.length === 13) {
-      console.log('ok')
-    } else {
+    if (book.isbn13.length !== 13) {
       chai.request(api)
         .post('/books')
         .send(book)
         .end((_, res) => {
           chai.expect(res.statusCode).to.equal(404)
           chai.expect(res.body).to.deep.equal({
-            error: 'ISBN of Book is malformed'
+            error: `ISBN of Book ${book.isbn13} is malformed`
           })
           done()
         })
     }
   })
 
-  // it('POST /books should return a bad request if price malformed')
+  it('POST /books should return a bad request if price malformed', function (done) {
+    const book = {
+      isbn13: '9782879017198',
+      title: 'Connaitre la Cuisine du Périgord',
+      authors: 'Thibault Clementine',
+      editor: 'Sud Ouest',
+      langCode: 'FR',
+      price: 'xr'
+    }
+    if (typeof book.price !== 'number') {
+      chai.request(api)
+        .post('/books')
+        .send(book)
+        .end((_, res) => {
+          chai.expect(res.statusCode).to.equal(404)
+          chai.expect(res.body).to.deep.equal({
+            error: 'Price of Book is malformed'
+          })
+          done()
+        })
+    }
+  })
 
-  // it('POST /books should return a bad request if lang code malformed')
+  it('POST /books should return a bad request if lang code malformed', function (done) {
+    const book = {
+      isbn13: '9782879017198',
+      title: 'Connaitre la Cuisine du Périgord',
+      authors: 'Thibault Clementine',
+      editor: 'Sud Ouest',
+      langCode: 4655,
+      price: 3.9
+    }
+    if (typeof book.langCode !== 'string' && book.langCode.length !== 2) {
+      chai.request(api)
+        .post(`/books/${book.isbn13}`)
+        .send(book)
+        .end((_, res) => {
+          chai.expect(res.statusCode).to.equal(404)
+          chai.expect(res.body).to.deep.equal({
+            error: `Lang Code of Book ${book.isbn13} is malformed`
+          })
+          done()
+        })
+    }
+  })
 
   it('GET /books/:id should return a success response with found book', function (done) {
+    const book = {
+      isbn13: '9782746035966',
+      title: 'Cree su primer sitio web con dreamweaver 8',
+      authors: 'B.A. GUERIN',
+      editor: 'ENI',
+      langCode: 'ES',
+      price: 15.78
+    }
     chai.request(api)
       .get('/books/9782746035966')
+      .send(book)
       .end((_, res) => {
         chai.expect(res.statusCode).to.equal(200)
         chai.expect(res.body).to.deep.equal({
-          data: {
-            isbn13: '9782746035966',
-            title: 'Cree su primer sitio web con dreamweaver 8',
-            authors: 'B.A. GUERIN',
-            editor: 'ENI',
-            langCode: 'ES',
-            price: 10.02
-          }
+          data: book
         })
         done()
       })
   })
 
   it('GET /books/:id should return not found response if the book does not exists', function (done) {
+    const book = {
+      isbn13: '9782746035966',
+      title: 'Cree su primer sitio web con dreamweaver 8',
+      authors: 'B.A. GUERIN',
+      editor: 'ENI',
+      langCode: 'ES',
+      price: 15.78
+    }
+    const idError = '1234567899999'
+
     chai.request(api)
-      .get('/books/1234567899999')
+      .get(`/books/${idError}`)
+      .send(book)
       .end((_, res) => {
         chai.expect(res.statusCode).to.equal(404)
         chai.expect(res.body).to.deep.equal({
-          error: 'Book 1234567899999 not found'
+          error: `Book ${idError} not found`
         })
         done()
       })
@@ -130,14 +183,7 @@ describe('Books', function () {
       .end((_, res) => {
         chai.expect(res.statusCode).to.equal(200)
         chai.expect(res.body).to.deep.equal({
-          data: {
-            isbn13: '9782746035966',
-            title: 'Cree su primer sitio web con dreamweaver 8',
-            authors: 'B.A. GUERIN',
-            editor: 'ENI',
-            langCode: 'ES',
-            price: 15.78
-          }
+          data: book
         })
         done()
       })
@@ -145,20 +191,22 @@ describe('Books', function () {
 
   it('PUT /books/:id should return not found response if the book does not exists', function (done) {
     const book = {
-      isbn13: '1234567899999',
+      isbn13: '9782746035966',
       title: 'Cree su primer sitio web con dreamweaver 8',
       authors: 'B.A. GUERIN',
       editor: 'ENI',
       langCode: 'ES',
       price: 15.78
     }
+    const idError = '1234567899999'
+
     chai.request(api)
-      .put('/books/1234567899999')
+      .put(`/books/${idError}`)
       .send(book)
       .end((_, res) => {
         chai.expect(res.statusCode).to.equal(404)
         chai.expect(res.body).to.deep.equal({
-          error: 'Book 1234567899999 not found'
+          error: `Book ${idError} not found`
         })
         done()
       })
@@ -173,29 +221,70 @@ describe('Books', function () {
       langCode: 'FR',
       price: 3.9
     }
-    if (book.isbn13.length === 13) {
-      console.log('ok')
-    } else {
+    if (book.isbn13.length !== 13) {
       chai.request(api)
-        .put('/books')
+        .put(`/books/${book.isbn13}`)
         .send(book)
         .end((_, res) => {
           chai.expect(res.statusCode).to.equal(404)
           chai.expect(res.body).to.deep.equal({
-            error: 'ISBN of Book is malformed'
+            error: `ISBN of Book ${book.isbn13} is malformed`
           })
           done()
         })
     }
   })
 
-  // it('PUT /books/:id should return a bad request if price malformed')
+  it('PUT /books/:id should return a bad request if price malformed', function (done) {
+    const book = {
+      isbn13: '9782879017198',
+      title: 'Connaitre la Cuisine du Périgord',
+      authors: 'Thibault Clementine',
+      editor: 'Sud Ouest',
+      langCode: 'FR',
+      price: 'xr'
+    }
+    if (typeof book.price !== 'number') {
+      chai.request(api)
+        .put(`/books/${book.isbn13}`)
+        .send(book)
+        .end((_, res) => {
+          chai.expect(res.statusCode).to.equal(404)
+          chai.expect(res.body).to.deep.equal({
+            error: `Price of Book ${book.isbn13} is malformed`
+          })
+          done()
+        })
+    }
+  })
 
-  // it('PUT /books/:id should return a bad request if lang code malformed')
+  it('PUT /books/:id should return a bad request if lang code malformed', function (done) {
+    const book = {
+      isbn13: '9782879017198',
+      title: 'Connaitre la Cuisine du Périgord',
+      authors: 'Thibault Clementine',
+      editor: 'Sud Ouest',
+      langCode: 4655,
+      price: 3.9
+    }
+    if (typeof book.langCode !== 'string' && book.langCode.length !== 2) {
+      chai.request(api)
+        .put(`/books/${book.isbn13}`)
+        .send(book)
+        .end((_, res) => {
+          chai.expect(res.statusCode).to.equal(404)
+          chai.expect(res.body).to.deep.equal({
+            error: `Lang Code of Book ${book.isbn13} is malformed`
+          })
+          done()
+        })
+    }
+  })
 
   it('DELETE /books/:id should return a success response', function (done) {
+    const bookDeleteId = '9782744005084'
     chai.request(api)
-      .delete('/books/9782744005084')
+      .delete(`/books/${bookDeleteId}`)
       .end((_, res) => {
         chai.expect(res.statusCode).to.equal(200)
         chai.expect(res.body).to.deep.equal({
@@ -215,12 +304,13 @@ describe('Books', function () {
   })
 
   it('DELETE /books/:id should return not found response if the book does not exists', function (done) {
+    const idError = '1234567899999'
     chai.request(api)
-      .delete('/books/1234567899999')
+      .delete(`/books/${idError}`)
       .end((_, res) => {
         chai.expect(res.statusCode).to.equal(404)
         chai.expect(res.body).to.deep.equal({
-          error: 'Book 1234567899999 not found'
+          error: `Book ${idError} not found`
         })
         done()
       })

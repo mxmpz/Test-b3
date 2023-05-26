@@ -4,4 +4,4 @@ import api from './api/index.js'
 dotenv.config()
 
 // For testing purposes
-export default api.launch(process.env.API_PORT);
+export default api.launch(process.env.API_PORT)
